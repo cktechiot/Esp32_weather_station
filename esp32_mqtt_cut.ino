@@ -4,12 +4,15 @@
 #include <DHT_U.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <TridentTD_LineNotify.h>
 
 const char* ssid = "CKTECH_2.4GHz";
 const char* password = "0817830056";
 
 //const char* ssid = "ck_iot";
 //const char* password = "ck@12345678";
+
+#define LINE_TOKEN  "bpltzZwa6c1UUU6oXlWrBxXDUYWBbRZCLkN7ExVQASb" //ใส่ รหัส TOKEN ที่ได้มาจากข้างบน
 
 const char* mqtt_server = "192.168.1.14";
 #define MQTT_PORT     1883
@@ -56,6 +59,7 @@ void print_wakeup_reason() {
   connectWiFi();
   data0 = "temp=" + String(t) + " ,humidity=" + String(h) + " ,pm2_5=" + String(pm2_5) + "\n";
   Serial.println(data0);
+  LINE.notify(data0);
 
   if (client.publish("MQTT/ESP32", data0.c_str()) == true) {
     Serial.println("Success sending");
@@ -73,6 +77,7 @@ void setup() {
   while (!Serial) ;
   mySerial.begin(9600);
   dht.begin();
+  LINE.setToken(LINE_TOKEN);
 
   sensor_t sensor;
   dht.temperature().getSensor(&sensor);
