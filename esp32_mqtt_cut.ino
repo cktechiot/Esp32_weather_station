@@ -16,13 +16,17 @@ const char* password = "0817830056";
 
 const char* mqtt_server = "192.168.1.14";
 #define MQTT_PORT     1883
+
+//const char* mqtt_server = "183.88.229.11";
+//#define MQTT_PORT     9135
+
 const char* mqtt_user = "esp02";
 const char* mqtt_pass = "12345";
 
 String data0;
 
-#define DHTPIN 27
-#define DHTTYPE    DHT22     // DHT 11
+#define DHTPIN 26
+#define DHTTYPE    DHT21     // DHT 11
 float t, h;
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
@@ -56,7 +60,9 @@ void print_wakeup_reason() {
   readDHT();
 
 
-  connectWiFi();
+  //  connectWiFi();
+  client.setServer(mqtt_server, MQTT_PORT);
+  client.connect("ESP32Client", mqtt_user, mqtt_pass);
   data0 = "temp=" + String(t) + " ,humidity=" + String(h) + " ,pm2_5=" + String(pm2_5) + "\n";
   Serial.println(data0);
   LINE.notify(data0);
@@ -87,6 +93,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   connectWiFi();
   client.setServer(mqtt_server, MQTT_PORT);
+  client.connect("ESP32Client", mqtt_user, mqtt_pass);
   dht.begin();
   delay(1000); //Take some time to open up the Serial Monitor
   //Increment boot number and print it every reboot
